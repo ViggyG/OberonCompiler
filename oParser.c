@@ -6,6 +6,8 @@ int main(int argc, char *argv[]) {
 	//csym.type is where the spelling of that token s stored
 	//csym.value is the original spelling while scanning
 
+	//example: if(csym.id == sMudl) {}
+
     //retrieving the filename
 	char fname[255];
 	if(!argv[1])
