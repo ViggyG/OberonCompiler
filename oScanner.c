@@ -9,8 +9,8 @@ enum sym {
 	sEquls, sLbrac, sRbrac, sPlus, sMinus, sHash, sLt,
 	sGt, sAst, sAmp, sDot, sIf, sThn, sElif, sEls, sWhl, sRep,
 	sUntl, sDo, sFor, sTo, sBy, sLoop, sCase, sOr, sDiv, sMod, sRet,
-	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sIdent, sNum, sDotDot
-}; //52
+	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sDotDot, sIdent, sNum,
+}; //53
 
 //spelling of tokens for printing
 const char * sSpell[] = {
@@ -19,7 +19,7 @@ const char * sSpell[] = {
 	"sEquls", "sLbrac", "sRbrac", "sPlus", "sMinus", "sHash", "sLt",
 	"sGt", "sAst", "sAmp", "sDot", "sIf", "sThn", "sElif", "sEls", "sWhl", "sRep",
 	"sUntl", "sDo", "sFor", "sTo", "sBy", "sLoop", "sCase", "sOr", "sDiv", "sMod", "sRet",
-	"sSqot", "sDqot", "sSlash", "sBar", "sAsgn", "sGteq", "sLteq", "sEnd"
+	"sSqot", "sDqot", "sSlash", "sBar", "sAsgn", "sGteq", "sLteq", "sEnd", "sDotDot"
 };
 
 //values of tokens for comparing
@@ -28,8 +28,10 @@ const char * sVals[] = {
 	"(", ")", "{", "}", ",", ":", ";", "=", "[", "]", "+", "-", "#", "<",
 	">", "*", "&", ".", "IF", "THEN", "ELSIF", "ELSE", "WHILE", "REPEAT",
 	"UNTIL", "DO", "FOR", "TO", "BY", "LOOP", "CASE", "OR", "DIV", "MOD", "RETURN",
-	"\'", "\"", "/", "|", ":=", ">=", "<=", "END"
-}; //51
+	"\'", "\"", "/", "|", ":=", ">=", "<=", "END", ".."
+}; //52
+
+const int symArrLength = 52;
 
 //reserved words
 const char * resWords[] = {
@@ -178,7 +180,7 @@ void resolveToken()
 	char tokenType[255];
 
 	//finding a token id based on the token
-	int tokenID = strInSet(sVals, tokenValue, 51);
+	int tokenID = strInSet(sVals, tokenValue, symArrLength);
 	
 	if(tokenID != -1) //if an id was found get the part of speech
 	{

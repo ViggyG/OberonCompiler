@@ -23,4 +23,4 @@ BEGIN
   Out.String( "GCD = ");
   Out.Int( gcd( m, n), 2);
   Out.Ln;
-END tstgcd.
+END.. tstgcd.

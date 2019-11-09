@@ -1,6 +1,8 @@
 #include "oScanner.c"
 
 int accept(enum sym id);
+void module();
+void block();
 
 int main(int argc, char *argv[]) {
 
@@ -26,10 +28,23 @@ int main(int argc, char *argv[]) {
 
     initScanner(fname);
 
-	nextToken();
-	printf("%d", accept(sDot));
+	module();
 
     closeFile();
+}
+
+
+void module() {
+	nextToken();
+	accept(sMdul);
+	accept(sIdent);
+	accept(sSmcln);
+	block();
+	accept(sDot);
+}
+
+void block() {
+	nextToken();
 }
 
 
@@ -45,5 +60,6 @@ int accept(enum sym id) {
 		printError(err);
 		res = 0;
 	 }
+	 nextToken();
 	return res;
 }
