@@ -1,5 +1,7 @@
 #include "oScanner.c"
 
+int accept(enum sym id);
+
 int main(int argc, char *argv[]) {
 
 	//csym.id where the symbol is stored after calling nextToken()
@@ -24,10 +26,24 @@ int main(int argc, char *argv[]) {
 
     initScanner(fname);
 
-	while(nextToken()) 
-	{
-		printf("%s - %s - %d\n", newToken.value, newToken.type, newToken.id);
-	};
+	nextToken();
+	printf("%d", accept(sDot));
 
     closeFile();
+}
+
+
+int accept(enum sym id) { 
+	int res = 1;
+	if(csym.id != id) {
+		char exp[255];
+		char err[255];
+		strcpy(err, csym.value);
+		strcpy(exp, sSpell[id]);
+		strcat(err, " found, expected ");
+		strcat(err, exp);
+		printError(err);
+		res = 0;
+	 }
+	return res;
 }
