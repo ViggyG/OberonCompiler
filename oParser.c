@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
     initScanner(fname);
 
-	//module();
+	module();
 
     closeFile();
 }
