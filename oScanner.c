@@ -9,7 +9,7 @@ enum sym {
 	sEquls, sLbrac, sRbrac, sPlus, sMinus, sHash, sLt,
 	sGt, sAst, sAmp, sDot, sIf, sThn, sElif, sEls, sWhl, sRep,
 	sUntl, sDo, sFor, sTo, sBy, sLoop, sCase, sOr, sDiv, sMod, sRet,
-	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sIdent, sNum
+	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sIdent, sNum, sDotDot
 }; //52
 
 //spelling of tokens for printing
@@ -51,7 +51,7 @@ struct token{
 };
 
 //initial variables
-struct token newToken;
+struct token csym;
 int isComment = 0;
 int isScanning = 0;
 
@@ -85,10 +85,6 @@ int initScanner(char fname[255])
 		currentChar = line[linePos++];
 		nextChar = line[linePos];
 		totalLines++;
-		while(nextToken()) 
-		{
-			printf("%s - %s - %d\n", newToken.value, newToken.type, newToken.id);
-		};
 	}
 	//close file
     return 0;
@@ -228,9 +224,9 @@ void resolveToken()
 	}
 
 	//setting values on the found token for reference
-	strcpy(newToken.value, tokenBuffer);
-	strcpy(newToken.type, tokenType);
-	newToken.id = tokenID;
+	strcpy(csym.value, tokenBuffer);
+	strcpy(csym.type, tokenType);
+	csym.id = tokenID;
 
 	resetTokenBuffer(); //reset the token buffer for the next token
 }

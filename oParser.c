@@ -1,6 +1,9 @@
 #include "oScanner.c"
 
 int main(int argc, char *argv[]) {
+
+	//  where the symbol is stored after calling nextToken()
+
     //retrieving the filename
 	char fname[255];
 	if(!argv[1])
@@ -16,6 +19,11 @@ int main(int argc, char *argv[]) {
 	}
 
     initScanner(fname);
+
+	while(nextToken()) 
+	{
+		printf("%s - %s - %d\n", newToken.value, newToken.type, newToken.id);
+	};
 
     closeFile();
 }
