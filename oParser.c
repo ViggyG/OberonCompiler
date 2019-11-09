@@ -1,6 +1,7 @@
 #include "oScanner.c"
 
 int accept(enum sym id);
+int isSym(enum sym id);
 void module();
 void block();
 
@@ -28,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     initScanner(fname);
 
-	//module();
+	module();
 
     closeFile();
 }
@@ -45,6 +46,7 @@ void module() {
 
 void block() {
 	nextToken();
+	if(symIs)
 }
 
 
@@ -63,3 +65,5 @@ int accept(enum sym id) {
 	 nextToken();
 	return res;
 }
+
+int isSym(enum sym id) { return csym.id == id; }
