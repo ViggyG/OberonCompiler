@@ -2,7 +2,9 @@
 
 int main(int argc, char *argv[]) {
 
-	//  where the symbol is stored after calling nextToken()
+	//csym.id where the symbol is stored after calling nextToken()
+	//csym.type is where the spelling of that token s stored
+	//csym.value is the original spelling while scanning
 
     //retrieving the filename
 	char fname[255];
