@@ -9,7 +9,7 @@ enum sym {
 	sEquls, sLbrac, sRbrac, sPlus, sMinus, sHash, sLt,
 	sGt, sAst, sAmp, sDot, sIf, sThn, sElif, sEls, sWhl, sRep,
 	sUntl, sDo, sFor, sTo, sBy, sLoop, sCase, sOr, sDiv, sMod, sRet,
-	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sDotDot, sIdent, sNum,
+	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sDotDot, sOf, sTild, sIdent, sNum, sHex
 }; //53
 
 //spelling of tokens for printing
@@ -19,7 +19,7 @@ const char * sSpell[] = {
 	"sEquls", "sLbrac", "sRbrac", "sPlus", "sMinus", "sHash", "sLt",
 	"sGt", "sAst", "sAmp", "sDot", "sIf", "sThn", "sElif", "sEls", "sWhl", "sRep",
 	"sUntl", "sDo", "sFor", "sTo", "sBy", "sLoop", "sCase", "sOr", "sDiv", "sMod", "sRet",
-	"sSqot", "sDqot", "sSlash", "sBar", "sAsgn", "sGteq", "sLteq", "sEnd", "sDotDot"
+	"sSqot", "sDqot", "sSlash", "sBar", "sAsgn", "sGteq", "sLteq", "sEnd", "sDotDot", "sOf", "sTild"
 };
 
 //values of tokens for comparing
@@ -28,10 +28,11 @@ const char * sVals[] = {
 	"(", ")", "{", "}", ",", ":", ";", "=", "[", "]", "+", "-", "#", "<",
 	">", "*", "&", ".", "IF", "THEN", "ELSIF", "ELSE", "WHILE", "REPEAT",
 	"UNTIL", "DO", "FOR", "TO", "BY", "LOOP", "CASE", "OR", "DIV", "MOD", "RETURN",
-	"\'", "\"", "/", "|", ":=", ">=", "<=", "END", ".."
+	"\'", "\"", "/", "|", ":=", ">=", "<=", "END", "..", "OF", "~"
 }; //52
 
-const int symArrLength = 52;
+const int SYM_ARR_LENGTH = 54;
+const int SPC_LENGTH = 23;
 
 //reserved words
 const char * resWords[] = {
@@ -42,8 +43,8 @@ const char * resWords[] = {
 //special chars for comparison
 char spchrs[] = {
 	'(', ')', '{', '}', ',', ':', ';', '=', '[', ']', '|',
-	'+', '-', '#', '<', '>', '*', '&', '.', '\'', '\"', '/'
-}; //22
+	'+', '-', '#', '<', '>', '*', '&', '.', '\'', '\"', '/', '~'
+}; //23
 
 //token structure
 struct token{
@@ -140,9 +141,9 @@ void resolveChar(char c, char nc)
 	if(isalnum(c))
 	{
 		//flagging the scanner to stop processing if the next character is a special one
-		if(chInSet(spchrs, nc, 22)) resToken = 1; 
+		if(chInSet(spchrs, nc, SPC_LENGTH)) resToken = 1; 
 	} 	
-	else if (chInSet(spchrs, c, 22)) //processing special chars
+	else if (chInSet(spchrs, c, SPC_LENGTH)) //processing special chars
 	{ 
 		//detecting line comment
 		if(c == '/' && nc == '/') 
@@ -180,7 +181,7 @@ void resolveToken()
 	char tokenType[255];
 
 	//finding a token id based on the token
-	int tokenID = strInSet(sVals, tokenValue, symArrLength);
+	int tokenID = strInSet(sVals, tokenValue, SYM_ARR_LENGTH);
 	
 	if(tokenID != -1) //if an id was found get the part of speech
 	{
@@ -204,7 +205,11 @@ void resolveToken()
 			{
 				if(isalpha(tc)) 
 				{
-					if(tc < 'g') ishex = 1;
+					if(tc < 'g') 
+					{
+						ishex = 1;
+						tokenID = (int)sHex;
+					}
 					else error = 1;
 				}
 				else if(!isdigit(tc)) error = 1;
