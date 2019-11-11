@@ -1,5 +1,4 @@
 MODULE tstgcd;
-  IMPORT In, Out;
   VAR m, n: INTEGER;
 
   PROCEDURE gcd(m, n: INTEGER): INTEGER;

@@ -9,7 +9,7 @@ enum sym {
 	sEquls, sLbrac, sRbrac, sPlus, sMinus, sHash, sLt,
 	sGt, sAst, sAmp, sDot, sIf, sThn, sElif, sEls, sWhl, sRep,
 	sUntl, sDo, sFor, sTo, sBy, sLoop, sCase, sOr, sDiv, sMod, sRet,
-	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sDotDot, sOf, sTild, sIdent, sNum, sHex
+	sSqot, sDqot, sSlash, sBar, sAsgn, sGteq, sLteq, sEnd, sDotDot, sOf, sTild, sExit, sIdent, sNum, sHex
 }; //53
 
 //spelling of tokens for printing
@@ -19,19 +19,19 @@ const char * sSpell[] = {
 	"sEquls", "sLbrac", "sRbrac", "sPlus", "sMinus", "sHash", "sLt",
 	"sGt", "sAst", "sAmp", "sDot", "sIf", "sThn", "sElif", "sEls", "sWhl", "sRep",
 	"sUntl", "sDo", "sFor", "sTo", "sBy", "sLoop", "sCase", "sOr", "sDiv", "sMod", "sRet",
-	"sSqot", "sDqot", "sSlash", "sBar", "sAsgn", "sGteq", "sLteq", "sEnd", "sDotDot", "sOf", "sTild"
+	"sSqot", "sDqot", "sSlash", "sBar", "sAsgn", "sGteq", "sLteq", "sEnd", "sDotDot", "sOf", "sTild", "sExit"
 };
 
 //values of tokens for comparing
 const char * sVals[] = {
-	"CONST", "TYPE", "VAR", "MODULE", "BEGIN", "PRODECURE", "ARRAY", "RECORD",
+	"CONST", "TYPE", "VAR", "MODULE", "BEGIN", "PROCEDURE", "ARRAY", "RECORD",
 	"(", ")", "{", "}", ",", ":", ";", "=", "[", "]", "+", "-", "#", "<",
 	">", "*", "&", ".", "IF", "THEN", "ELSIF", "ELSE", "WHILE", "REPEAT",
 	"UNTIL", "DO", "FOR", "TO", "BY", "LOOP", "CASE", "OR", "DIV", "MOD", "RETURN",
-	"\'", "\"", "/", "|", ":=", ">=", "<=", "END", "..", "OF", "~"
+	"\'", "\"", "/", "|", ":=", ">=", "<=", "END", "..", "OF", "~", "EXIT"
 }; //52
 
-const int SYM_ARR_LENGTH = 54;
+const int SYM_ARR_LENGTH = 55;
 const int SPC_LENGTH = 23;
 
 //reserved words
@@ -235,7 +235,7 @@ void resolveToken()
 	strcpy(csym.type, tokenType);
 	csym.id = tokenID;
 
-	printf("%s\n", csym.value);
+	//printf("%s\n", csym.value);
 
 	resetTokenBuffer(); //reset the token buffer for the next token
 }

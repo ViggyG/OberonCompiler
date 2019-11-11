@@ -1,7 +1,10 @@
 #include "oScanner.c"
+#include <stdlib.h>
 
 int accept(enum sym id);
 int isSym(enum sym id);
+void dPrint(char str[255]);
+
 void module();
 void block();
 void declSeq();
@@ -53,6 +56,9 @@ void designator();
 void selector();
 void constDecl();
 
+int debug = 0;
+char currentState[255];
+
 int main(int argc, char *argv[]) {
 
 	//csym.id where the symbol is stored after calling nextToken()
@@ -74,6 +80,7 @@ int main(int argc, char *argv[]) {
 		//setting filename to command line argument
 		strcpy(fname, argv[1]);
 	}
+	if(argv[2]) debug = 1;
 
     initScanner(fname);
 
@@ -84,6 +91,7 @@ int main(int argc, char *argv[]) {
 
 
 void module() {
+	dPrint("module");
 	nextToken();
 	accept(sMdul);
 	accept(sIdent);
@@ -93,6 +101,7 @@ void module() {
 }
 
 void block() {
+	dPrint("block");
 	declSeq();
 
 	if(isSym(sBgin)) {
@@ -105,6 +114,7 @@ void block() {
 }
 
 void declSeq() {
+	dPrint("declSeq");
 	if(isSym(sCnst))
 	{
 		nextToken();
@@ -128,6 +138,7 @@ void declSeq() {
 }
 
 void constDecls() {
+	dPrint("constDecls");
 	constDecl();
 	while(isSym(sIdent))
 	{
@@ -136,6 +147,7 @@ void constDecls() {
 }
 
 void constDecl() {
+	dPrint("constDecl");
 	accept(sIdent);
 	accept(sEquls);
 	constExpr();
@@ -143,6 +155,7 @@ void constDecl() {
 }
 
 void typeDecls() {
+	dPrint("typeDecls");
 	typeDecl();
 	while(isSym(sIdent))
 	{
@@ -151,6 +164,7 @@ void typeDecls() {
 }
 
 void typeDecl() {
+	dPrint("typeDecl");
 	accept(sIdent);
 	accept(sEquls);
 	type();
@@ -158,6 +172,7 @@ void typeDecl() {
 }
 
 void type() {
+	dPrint("type");
 	if(isSym(sIdent)) accept(sIdent);
 	else if(isSym(sArry)) arrayType();
 	else if(isSym(sRcrd)) recordType();
@@ -166,6 +181,7 @@ void type() {
 }
 
 void arrayType() {
+	dPrint("arrayType");
 	accept(sArry);
 	length();
 	while(isSym(sCmma)) {
@@ -177,10 +193,12 @@ void arrayType() {
 }
 
 void length() {
+	dPrint("length");
 	constExpr();
 }
 
 void recordType() {
+	dPrint("recordType");
 	accept(sRcrd);
 	fieldList();
 	while(isSym(sSmcln)) {
@@ -191,6 +209,7 @@ void recordType() {
 }
 
 void enumType() {
+	dPrint("enumType");
 	accept(sLparen);
 	accept(sIdent);
 	while(isSym(sCmma)) {
@@ -201,6 +220,7 @@ void enumType() {
 }
 
 void varDecls() {
+	dPrint("varDecls");
 	varDecl();
 	while(isSym(sIdent)) {
 		varDecl();
@@ -208,6 +228,7 @@ void varDecls() {
 }
 
 void varDecl() {
+	dPrint("varDecl");
 	identList();
 	accept(sColn);
 	type();
@@ -215,6 +236,7 @@ void varDecl() {
 }
 
 void identList() {
+	dPrint("identList");
 	accept(sIdent);
 	while(isSym(sCmma)) {
 		nextToken();
@@ -223,6 +245,7 @@ void identList() {
 }
 
 void procDecl() {
+	dPrint("procDecl");
 	accept(sProc);
 	accept(sIdent);
 	if(isSym(sLparen)) {
@@ -238,6 +261,7 @@ void procDecl() {
 }
 
 void formalParams() {
+	dPrint("formalParams");
 	accept(sLparen);
 	if(isSym(sVar) || isSym(sIdent)) {
 		fPSection();
@@ -250,6 +274,7 @@ void formalParams() {
 }
 
 void fPSection() {
+	dPrint("fPSection");
 	if(isSym(sVar)){
 		nextToken();
 	}
@@ -259,14 +284,17 @@ void fPSection() {
 }
 
 void formalType() {
+	dPrint("formalType");
 	accept(sIdent);
 }
 
 void procBody() {
+	dPrint("procBody");
 	block();
 }
 
 void fieldList() {
+	dPrint("fieldList");
 	if(isSym(sIdent)){
 		identList();
 		accept(sColn);
@@ -275,6 +303,7 @@ void fieldList() {
 }
 
 void statSeq() {
+	dPrint("statSeq");
 	stat();
 	while(isSym(sSmcln)) {
 		nextToken();
@@ -283,20 +312,54 @@ void statSeq() {
 }
 
 void stat() {
+	dPrint("stat");
+	switch(csym.id) {
+		case sIdent:
+			assignStat();
+			break;
+		case sIf:
+			ifStat();
+			break;
+		case sWhl:
+			whileStat();
+			break;
+		case sRep:
+			repeatStat();
+			break;
+		case sFor:
+			forStat();
+			break;
+		case sLoop:
+			loopStat();
+			break;
+		case sCase:
+			caseStat();
+			break;
+		case sExit:
+			accept(sExit);
+			break;
+		case sRet:
+			accept(sRet);
+			if(isSym(sPlus) || isSym(sMinus) || isSym(sNum) || 
+				isSym(sIdent) || isSym(sLparen) || isSym(sTild)) expr();
+	}
 }
 
 void assignStat() {
+	dPrint("assignStat");
 	designator();
 	accept(sAsgn);
 	expr();
 }
 
 void procCall() {
+	dPrint("procCall");
 	accept(sIdent);
 	
 }
 
 void actParams() {
+	dPrint("actParams");
 	accept(sLparen);
 	if(!isSym(sRparen)) {
 		expr();
@@ -309,6 +372,7 @@ void actParams() {
 }
 
 void readParams() {
+	dPrint("readParams");
 	accept(sLparen);
 	readParam();
 	while(isSym(sCmma)) {
@@ -319,14 +383,17 @@ void readParams() {
 }
 
 void readLnParams() {
+	dPrint("readLnParams");
 	readParams();
 }
 
 void readParam() {
+	dPrint("readParam");
 	designator();
 }
 
 void writeParams() {
+	dPrint("writeParams");
 	accept(sLparen);
 	writeParam();
 	while(isSym(sCmma)) {
@@ -337,14 +404,17 @@ void writeParams() {
 }
 
 void writeLnParams() {
+	dPrint("writeLnParams");
 	writeParams();
 }
 
 void writeParam() {
+	dPrint("writeParam");
 	expr();
 }
 
 void ifStat() {
+	dPrint("ifStat");
 	accept(sIf);
 	expr();
 	accept(sThn);
@@ -363,6 +433,7 @@ void ifStat() {
 }
 
 void whileStat() {
+	dPrint("whileStat");
 	accept(sWhl);
 	expr();
 	accept(sDo);
@@ -378,6 +449,7 @@ void whileStat() {
 
 void repeatStat()
 {
+	dPrint("repeatStat");
 	accept(sRep);
 	statSeq();
 	accept(sUntl);
@@ -386,6 +458,7 @@ void repeatStat()
 
 void forStat()
 {
+	dPrint("forStat");
 	accept(sFor);
 	accept(sIdent);
 	accept(sAsgn);
@@ -403,6 +476,7 @@ void forStat()
 
 void loopStat()
 {
+	dPrint("loopStat");
 	accept(sLoop);
 	statSeq();
 	accept(sEnd);
@@ -410,6 +484,7 @@ void loopStat()
 
 void caseStat()
 {
+	dPrint("caseStat");
 	accept(sCase);
 	expr();
 	accept(sOf);
@@ -427,6 +502,7 @@ void caseStat()
 
 void pCase()
 {
+	dPrint("pCase");
 	if(isSym(sPlus) || isSym(sMinus) || isSym(sNum) || 
 	isSym(sIdent) || isSym(sLparen) || isSym(sTild))
 	{
@@ -442,6 +518,7 @@ void pCase()
 
 void caseLabs()
 {
+	dPrint("caseLabs");
 	constExpr();
 	if(isSym(sDotDot))
 	{
@@ -452,11 +529,13 @@ void caseLabs()
 
 void constExpr()
 {
+	dPrint("constExpr");
 	expr();
 }
 
 void expr() 
 {
+	dPrint("expr");
 	simplExpr();
 	if(isSym(sEquls) || isSym(sHash) || isSym(sLt) || 
 	isSym(sLteq) || isSym(sGt) || isSym(sGteq)) {
@@ -467,6 +546,7 @@ void expr()
 
 void simplExpr() 
 {
+	dPrint("simpleExpr");
 	if(isSym(sPlus) || isSym(sMinus))
 		nextToken();
 	term();
@@ -478,6 +558,7 @@ void simplExpr()
 
 void term()
 {
+	dPrint("term");
 	factor();
 	while(isSym(sAst) || isSym(sDiv) || isSym(sMod) || isSym(sAmp)) {
 		mulOp();
@@ -488,6 +569,7 @@ void term()
 
 void factor()
 {
+	dPrint("factor");
 	switch(csym.id){
 		case(sNum):
 			accept(sNum);
@@ -513,6 +595,7 @@ void factor()
 
 void addOp()
 {
+	dPrint("addOp");
 	if(isSym(sPlus) || isSym(sMinus) || isSym(sOr)) 
 		nextToken();
 	else printError("Expected '+', '-', or 'OR'");
@@ -520,6 +603,7 @@ void addOp()
 
 void relation()
 {
+	dPrint("relation");
 	if(isSym(sEquls) || isSym(sHash) || isSym(sLt) || 
 	isSym(sLteq) || isSym(sGt) || isSym(sGteq)) 
 		nextToken();
@@ -528,6 +612,7 @@ void relation()
 
 void mulOp() 
 {
+	dPrint("mulOp");
 	if(isSym(sAst) || isSym(sDiv) || isSym(sMod) || isSym(sAmp))
 		nextToken();
 	else printError("Expected '*', '&', 'DIV', or 'MOD'");
@@ -535,6 +620,7 @@ void mulOp()
 
 void designator()
 {
+	dPrint("designator");
 	accept(sIdent);
 	while(isSym(sDot) || isSym(sLbrac)) {
 		selector();
@@ -543,6 +629,7 @@ void designator()
 
 void selector() 
 {
+	dPrint("selector");
 	if(isSym(sDot)) {
 		accept(sDot);
 		accept(sIdent);
@@ -562,15 +649,37 @@ int accept(enum sym id) {
 	if(csym.id != id) {
 		char exp[255];
 		char err[255];
+		switch(id) {
+			case sIdent:
+				strcpy(exp, "sIdent");
+				break;
+			case sHex:
+				strcpy(exp, "sHex");
+				break;
+			case sNum:
+				strcpy(exp, "sNum");
+				break;
+			default:
+				strcpy(exp, sSpell[id]);
+				break;
+		}
 		strcpy(err, csym.value);
-		strcpy(exp, sSpell[id]);
 		strcat(err, " found, expected ");
 		strcat(err, exp);
 		printError(err);
 		res = 0;
+		exit(1);
 	 }
 	 nextToken();
 	return res;
+}
+
+void dPrint(char str[255])
+{
+	if(debug) {
+		printf("%s FROM: %s\n",str, currentState);
+		strcpy(currentState, str);	
+	} 
 }
 
 int isSym(enum sym id) { return csym.id == id; }
