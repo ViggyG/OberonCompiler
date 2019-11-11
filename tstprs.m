@@ -1,3 +1,5 @@
 MODULE tstprs;
-55
-.
+PROCEDURE test;
+END test
+
+END tstprs.

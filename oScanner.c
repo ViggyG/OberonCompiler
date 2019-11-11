@@ -235,6 +235,8 @@ void resolveToken()
 	strcpy(csym.type, tokenType);
 	csym.id = tokenID;
 
+	printf("%s\n", csym.value);
+
 	resetTokenBuffer(); //reset the token buffer for the next token
 }
 
@@ -270,7 +272,7 @@ int strInSet(const char * set[], char * str, int length)
 void printError(char errstr[])
 {
 	char templine[255];
-	printf("ERROR: %s LINE: %d\n", errstr, linePos);
+	printf("ERROR: %s LINE: %d\n", errstr, totalLines);
 	printf("%s\n",line);
 	for(int i=0; i<linePos; i++) printf(" ");
 	printf("^\n");

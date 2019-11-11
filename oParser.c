@@ -35,11 +35,23 @@ void writeLnParam();
 void writeParam();
 void ifStat();
 void whileStat();
-
-void designator();
+void repeatStat();
+void forStat();
+void loopStat();
+void caseStat();
+void pCase();
+void caseLabs();
 void constExpr();
-void constDecl();
 void expr();
+void simplExpr();
+void term();
+void factor();
+void addOp();
+void relation();
+void mulOp();
+void designator();
+void selector();
+void constDecl();
 
 int main(int argc, char *argv[]) {
 
@@ -95,14 +107,17 @@ void block() {
 void declSeq() {
 	if(isSym(sCnst))
 	{
+		nextToken();
 		constDecls();
 	}
 
 	if(isSym(sType)) {
+		nextToken();
 		typeDecls();
 	}
 
 	if(isSym(sVar)) {
+		nextToken();
 		varDecls();
 	}
 
@@ -361,9 +376,186 @@ void whileStat() {
 	accept(sEnd);
 }
 
-void designator() {}
-void constExpr() {}
-void expr() {}
+void repeatStat()
+{
+	accept(sRep);
+	statSeq();
+	accept(sUntl);
+	expr();
+}
+
+void forStat()
+{
+	accept(sFor);
+	accept(sIdent);
+	accept(sAsgn);
+	expr();
+	accept(sTo);
+	expr();
+	if(isSym(sBy)){
+		accept(sBy);
+		constExpr();
+	}
+	accept(sDo);
+	statSeq();
+	accept(sEnd);
+}
+
+void loopStat()
+{
+	accept(sLoop);
+	statSeq();
+	accept(sEnd);
+}
+
+void caseStat()
+{
+	accept(sCase);
+	expr();
+	accept(sOf);
+	pCase();
+	while(isSym(sBar)) {
+		accept(sBar);
+		pCase();
+	}
+	if(isSym(sEls)) {
+		accept(sEls);
+		statSeq();
+	}
+	accept(sEnd);
+}
+
+void pCase()
+{
+	if(isSym(sPlus) || isSym(sMinus) || isSym(sNum) || 
+	isSym(sIdent) || isSym(sLparen) || isSym(sTild))
+	{
+		caseLabs();
+		while(isSym(sCmma)) {
+			accept(sCmma);
+			caseLabs();
+		}
+		accept(sColn);
+		statSeq();
+	}
+}
+
+void caseLabs()
+{
+	constExpr();
+	if(isSym(sDotDot))
+	{
+		accept(sDotDot);
+		constExpr();
+	}	
+}
+
+void constExpr()
+{
+	expr();
+}
+
+void expr() 
+{
+	simplExpr();
+	if(isSym(sEquls) || isSym(sHash) || isSym(sLt) || 
+	isSym(sLteq) || isSym(sGt) || isSym(sGteq)) {
+		relation();
+		simplExpr();
+	}
+}
+
+void simplExpr() 
+{
+	if(isSym(sPlus) || isSym(sMinus))
+		nextToken();
+	term();
+	while(isSym(sPlus) || isSym(sMinus) || isSym(sOr)) {
+		addOp();
+		term();
+	}
+}
+
+void term()
+{
+	factor();
+	while(isSym(sAst) || isSym(sDiv) || isSym(sMod) || isSym(sAmp)) {
+		mulOp();
+		factor();
+	}
+		
+}
+
+void factor()
+{
+	switch(csym.id){
+		case(sNum):
+			accept(sNum);
+			break;
+		case(sIdent):
+			designator();
+			if(isSym(sLparen)) actParams();
+			break;
+		case(sLparen):
+			accept(sLparen);
+			expr();
+			accept(sRparen);
+			break;
+		case(sTild):
+			accept(sTild);
+			factor();
+			break;
+		default: 
+			printError("Expected integer, ident, '(', or '~'");
+			nextToken();
+	}
+}
+
+void addOp()
+{
+	if(isSym(sPlus) || isSym(sMinus) || isSym(sOr)) 
+		nextToken();
+	else printError("Expected '+', '-', or 'OR'");
+}
+
+void relation()
+{
+	if(isSym(sEquls) || isSym(sHash) || isSym(sLt) || 
+	isSym(sLteq) || isSym(sGt) || isSym(sGteq)) 
+		nextToken();
+	else printError("Expected '=', '#', '<', '<=', '>', or '>='");
+}
+
+void mulOp() 
+{
+	if(isSym(sAst) || isSym(sDiv) || isSym(sMod) || isSym(sAmp))
+		nextToken();
+	else printError("Expected '*', '&', 'DIV', or 'MOD'");
+}
+
+void designator()
+{
+	accept(sIdent);
+	while(isSym(sDot) || isSym(sLbrac)) {
+		selector();
+	}
+}
+
+void selector() 
+{
+	if(isSym(sDot)) {
+		accept(sDot);
+		accept(sIdent);
+	} else {
+		accept(sLbrac);
+		expr();
+		while(isSym(sCmma)) {
+    		nextToken();
+    		expr();
+  		}
+		accept(sRbrac);
+	}
+}
 
 int accept(enum sym id) { 
 	int res = 1;

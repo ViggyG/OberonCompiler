@@ -16,11 +16,5 @@ MODULE tstgcd;
   END gcd;
 
 BEGIN
-  Out.String( 'm = ');
-  In.Int( m);
-  Out.String( "n = ");
-  In.Int( n);
-  Out.String( "GCD = ");
-  Out.Int( gcd( m, n), 2);
-  Out.Ln;
-END.. tstgcd.
+  
+END tstgcd.
