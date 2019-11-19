@@ -1,3 +1,5 @@
+//Authors: Gaelin Vigelius, Niko Sokolowicz
+
 #include "oScanner.c"
 #include <stdlib.h>
 
@@ -356,7 +358,6 @@ void assignStat() {
 void procCall() {
 	dPrint("procCall");
 	accept(sIdent);
-	lookAhead();
 	enum sym la = lookAhead();
 	if(la == sRparen) actParams();
 	else if (la == sIdent)
@@ -657,9 +658,10 @@ void selector()
 int accept(enum sym id) { 
 	//init
 	int res = 1;
+	char exp[255];
+	char err[255];
 	if(csym.id != id) {
-		char exp[255];
-		char err[255];
+		
 		//setting exp to specific values here, for index out of bounds reasons
 		switch(id) {
 			case sIdent:
@@ -683,6 +685,24 @@ int accept(enum sym id) {
 		res = 0;
 		exit(1); //exiting program
 	 }
+	 if(debug)
+	 {
+		 switch(id) {
+			case sIdent:
+				strcpy(exp, "sIdent");
+				break;
+			case sHex:
+				strcpy(exp, "sHex");
+				break;
+			case sNum:
+				strcpy(exp, "sNum");
+				break;
+			default:
+				strcpy(exp, sSpell[id]);
+				break;
+		}
+		printf(" ACCEPTED: %s\n", exp);
+	 } 
 	 nextToken(); //alling the next token
 	return res;
 }
@@ -691,7 +711,7 @@ int accept(enum sym id) {
 void dPrint(char str[255])
 {
 	if(debug) {
-		printf("%s FROM: %s\n",str, currentState);
+		printf("ENTERED %s FROM: %s\n",str, currentState);
 		strcpy(currentState, str);	
 	} 
 }
