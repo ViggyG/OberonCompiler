@@ -84,9 +84,9 @@ int main(int argc, char *argv[]) {
 
     initScanner(fname);
 
-	module();
+	module(); //starting the parse
 
-    closeFile();
+    closeFile(); //closing the file
 }
 
 
@@ -315,7 +315,8 @@ void stat() {
 	dPrint("stat");
 	switch(csym.id) {
 		case sIdent:
-			assignStat();
+			if(lookAhead() == sAsgn) assignStat();
+			else procCall();
 			break;
 		case sIf:
 			ifStat();
@@ -355,7 +356,15 @@ void assignStat() {
 void procCall() {
 	dPrint("procCall");
 	accept(sIdent);
-	
+	lookAhead();
+	enum sym la = lookAhead();
+	if(la == sRparen) actParams();
+	else if (la == sIdent)
+	{
+		enum sym la2 = lookAhead();
+		if(la2 == sDot || la2 == sLbrac) readParams();
+		else writeParams();
+	}
 }
 
 void actParams() {
@@ -644,11 +653,14 @@ void selector()
 	}
 }
 
+//function for accepting a aymbol
 int accept(enum sym id) { 
+	//init
 	int res = 1;
 	if(csym.id != id) {
 		char exp[255];
 		char err[255];
+		//setting exp to specific values here, for index out of bounds reasons
 		switch(id) {
 			case sIdent:
 				strcpy(exp, "sIdent");
@@ -663,17 +675,19 @@ int accept(enum sym id) {
 				strcpy(exp, sSpell[id]);
 				break;
 		}
+		//constructing the string
 		strcpy(err, csym.value);
 		strcat(err, " found, expected ");
 		strcat(err, exp);
 		printError(err);
 		res = 0;
-		exit(1);
+		exit(1); //exiting program
 	 }
-	 nextToken();
+	 nextToken(); //alling the next token
 	return res;
 }
 
+//print debug information about the parsers functioning 
 void dPrint(char str[255])
 {
 	if(debug) {
@@ -682,4 +696,5 @@ void dPrint(char str[255])
 	} 
 }
 
+//simple function for checking equality of the current symbol
 int isSym(enum sym id) { return csym.id == id; }

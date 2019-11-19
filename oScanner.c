@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
+
+#define SYM_LENGTH 255
 
 //symbol enum for future convienince
 enum sym {
@@ -55,6 +58,7 @@ struct token{
 
 //initial variables
 struct token csym;
+struct token procSym;
 int isComment = 0;
 int isScanning = 0;
 
@@ -68,6 +72,13 @@ char * pTokenBuffer = &tokenBuffer[0];
 char currentChar;
 char nextChar;
 
+const int LOOKAHEAD_LENGTH = 50;
+enum sym lookaheadIds[50];
+char **lookaheadTypes;
+char **lookaheadValues;
+int totalLookahead = 0;
+int currentLookahead = 0;
+
 //function decl
 int nextToken();
 void resolveChar(char c, char pc);
@@ -77,6 +88,8 @@ int chInSet(char set[], char c, int length);
 int strInSet(const char * set[], char str[], int length);
 void printError(char errstr[]);
 void closeFile();
+int processToken();
+enum sym lookAhead();
 
 int initScanner(char fname[255])
 {	
@@ -88,12 +101,59 @@ int initScanner(char fname[255])
 		currentChar = line[linePos++];
 		nextChar = line[linePos];
 		totalLines++;
+
+		lookaheadValues = malloc(LOOKAHEAD_LENGTH * sizeof(char*));
+		lookaheadTypes = malloc(LOOKAHEAD_LENGTH * sizeof(char*));
+		for(int i=0; i<LOOKAHEAD_LENGTH; i++)
+		{
+			lookaheadValues[i] = malloc((SYM_LENGTH+1) * sizeof(char));
+			lookaheadTypes[i] = malloc((SYM_LENGTH+1) * sizeof(char));
+		}
 	}
-	//close file
+	
     return 0;
 };
 
-int nextToken()
+
+enum sym lookAhead()
+{
+	if(processToken())
+	{
+		lookaheadIds[totalLookahead] = procSym.id;
+		strcpy(lookaheadValues[totalLookahead] , procSym.value);
+		strcpy(lookaheadTypes[totalLookahead] , procSym.type);
+		++totalLookahead;
+	}
+	return procSym.id;
+}
+
+
+int nextToken() 
+{
+	int result = 1;
+	if(currentLookahead == totalLookahead)
+	{
+		if(result = processToken())
+		{
+			strcpy(csym.value, procSym.value);
+			strcpy(csym.type, procSym.type);
+			csym.id = procSym.id;
+			currentLookahead = 0;
+			totalLookahead = 0;
+		}
+	}
+	else
+	{
+		strcpy(csym.value, lookaheadValues[currentLookahead]);
+		strcpy(csym.type, lookaheadTypes[currentLookahead]);
+		csym.id = lookaheadIds[currentLookahead];
+		++currentLookahead;
+	}
+	
+	return result;
+}
+
+int processToken()
 {
 	//init
 	int result = 1;
@@ -231,9 +291,9 @@ void resolveToken()
 	}
 
 	//setting values on the found token for reference
-	strcpy(csym.value, tokenBuffer);
-	strcpy(csym.type, tokenType);
-	csym.id = tokenID;
+	strcpy(procSym.value, tokenBuffer);
+	strcpy(procSym.type, tokenType);
+	procSym.id = tokenID;
 
 	//printf("%s\n", csym.value);
 
@@ -250,6 +310,14 @@ void resetTokenBuffer()
 void closeFile() {
 	printf("\n");
 	fclose(fpointer);
+	
+	for(int i=0; i<LOOKAHEAD_LENGTH; i++)
+	{
+		free(lookaheadValues[i]);
+		free(lookaheadTypes[i]);
+	}
+	free(lookaheadValues);
+	free(lookaheadTypes);
 }
 
 //tool for checking if a character is in a set

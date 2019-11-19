@@ -21,4 +21,5 @@ BEGIN
 END test;
 
 BEGIN
+test()
 END tstprs.
