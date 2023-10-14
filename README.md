@@ -8,7 +8,7 @@ Now I know what you're thinking - "Oberon? What's that?"
 
 Man, aren't we all? 
 
-My professor had an attachment to this programming language. The same sort of attachment he had to haskel, ms dos, and any technology older than 1990. 
+My professor had an attachment to this programming language. The same sort of attachment he had to haskel, ms dos, and any technology predating 1990. 
 
 It was this same professor who taught me x86 assembly, theory of computing, and programming languages. Or in other words, things that sound cool, but end up having much more math in them than you might think. 
 
